@@ -1,0 +1,34 @@
+name: CI/CD for Wisecow Application
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Docker image
+        run: |
+          docker build -t wisecow-app .
+          docker tag wisecow-app <your-docker-registry>/wisecow:latest
+
+      - name: Push Docker image to registry
+        run: |
+          docker push <your-docker-registry>/wisecow:latest
+
+      - name: Deploy to Kubernetes
+        run: kubectl apply -f kubernetes/
+
+      - name: Wait for deployment to be ready
+        run: kubectl rollout status deployment/wisecow-deployment

@@ -1,0 +1,19 @@
+#4. Application Health Checker: 
+
+Overall Code 
+------------
+
+#!/bin/bash
+
+url="http://localhost:"  // your application's ( Health Checker ) URL
+
+function check_application_health {
+    local response_code=$(curl -sL -w "%{http_code}" "$url" -o /dev/null)
+    if [[ $response_code -eq 200 ]]; then
+        echo "Application at $url is UP (status code: 200)"
+    else
+        echo "Application at $url is DOWN (status code: $response_code)"
+    fi
+}
+
+check_application_health
